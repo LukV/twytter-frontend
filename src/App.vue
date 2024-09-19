@@ -1,25 +1,32 @@
 <template>
   <div id="app">
     <div class="container">
-      <div class="layout">
-        <SideBar />
-        <main class="feed">
-          <div class="feed-header">
-            <h2>Home</h2>
-          </div>
-          <TweetComposer />
-          <div class="timeline">
-            <TweetsFeed v-for="post in tweetStore.posts" :key="post.timestamp" :post="post" />
-          </div>
-        </main>
-        <aside class="right-sidebar">
-          <TrendingTags />
-          <SuggestedFollows />
-        </aside>
-      </div>
+      <SideBar />
+      <main class="feed">
+        <header>
+          <h1><i class="fa fa-arrow-left"></i> Home</h1>
+        </header>
+        <TweetComposer />
+        <div class="tabs">
+          <button class="tab active" id="for-you-tab">For you</button>
+          <button class="tab" id="following-tab">Following</button>
+        </div>
+        <div class="timeline">
+          <TweetsFeed v-for="post in tweetStore.posts" :key="post.timestamp" :post="post" />
+        </div>
+      </main>
+
+      <!-- Right Sidebar (Optional for trends, etc.) -->
+      <aside class="sidebar-right">
+        <UserProfile />
+        <TrendingTags />
+        <SuggestedFollows />
+      </aside>
     </div>
   </div>
 </template>
+
+
 
 <script>
 import { useTweetStore } from './stores/tweetStore';
@@ -28,6 +35,7 @@ import TweetComposer from './components/TweetComposer.vue';
 import TweetsFeed from './components/TweetsFeed.vue';
 import TrendingTags from './components/TrendingTags.vue';
 import SuggestedFollows from './components/SuggestedFollows.vue';
+import UserProfile from './components/UserProfile.vue';
 
 export default {
   components: {
@@ -35,18 +43,25 @@ export default {
     TweetComposer,
     TweetsFeed,
     TrendingTags,
-    SuggestedFollows
+    SuggestedFollows, 
+    UserProfile
   },
   setup() {
     const tweetStore = useTweetStore();
     tweetStore.fetchPosts(); // Fetch posts when the component is mounted
     return { tweetStore };
-  }
+  },
+  data() {
+    return {
+      email: '',
+      password: '',
+      errorMessage: '',
+    };
+  },
 };
 </script>
 
 <style>
-/* Reset */
 * {
   margin: 0;
   padding: 0;
@@ -54,235 +69,142 @@ export default {
 }
 
 body {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  background-color: white; /* Page background set to white */
+  font-family: 'Helvetica Neue', 'Inter', sans-serif;
+  color: rgb(44, 44, 44)
 }
 
-#app {
+.container {
   display: flex;
-  flex-direction: column;
-  height: 100vh;
+  justify-content: center;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Layout */
-.layout {
+/* Feed section */
+.feed {
+  width: 600px;
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+.feed header {
+  padding: 15px 0 25px;
+}
+
+.feed h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.tabs {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.tab {
+  background-color: transparent;
+  margin-right: 20px;
+  padding: 10px 20px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  color: #555;
+  transition: border-bottom 0.3s ease, color 0.3s ease;
+}
+
+.tab:hover {
+  color: #5548c0 
+}
+
+.tab.active {
+  border-bottom: 5px solid; 
+}
+
+/* TODO: move below CSS to components */
+
+.icons i {
+  margin-right: 10px; 
+}
+
+.icons a {
+  color: rgb(44, 44, 44)
+}
+
+.post-user, .user-profile {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+}
+
+.profile-pic {
+  width: 70px;
+  height: 70px;
+  border-radius: 40%;
+  margin-right: 10px;
+  border: 3px solid;
+}
+
+.purple-border {
+  border-color: rgb(85, 72, 192)
+}
+
+.brown-border {
+  border-color: rgb(192, 141, 115);
+}
+
+.pink-border {
+  border-color: rgb(234, 108, 122);
+}
+
+.user-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.user-info p {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.post-content p {
+  margin-top: 10px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Right sidebar */
+.sidebar-right {
+  width: 250px;
   padding: 20px;
 }
 
-/* Container for layout with max-width and min-width */
-.container {
-  max-width: 1200px;  /* Maximum width */
-  min-width: 800px;   /* Minimum width */
-  margin: 0 auto;     /* Center the container */
-  padding: 0 20px;    /* Add some padding for smaller screens */
+.user-profile {
+  margin-top:20px;
 }
 
-/* Sidebar Navigation */
-.sidebar {
-  width: 20%;
-  display: flex;
-  flex-direction: column;
-  padding-left: 20px;
-}
-
-.twitter-logo {
-  width: 40px;
-  height: 40px;
-  margin: 20px;
-}
-
-.sidebar ul {
-  list-style: none;
-  margin-left: 22px;
-}
-
-.sidebar ul li {
-  padding: 12px 0;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.sidebar ul li:hover {
-  color: #1da1f2;
-}
-
-.tweet-button {
-  background-color: #1da1f2;
-  color: white;
-  border: none;
-  padding: 16px 18px; 
+.sidebar-right section {
+  border: 1px solid  rgb(192, 141, 115);
   border-radius: 25px;
-  font-weight: bold; 
-  font-size: 100%;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-.tweet-button:hover {
-  background-color: #1991db;
-}
-
-/* Feed (Timeline) */
-.feed {
-  width: 55%;
-  margin: 0 20px; /* Add extra margin around the feed */
-}
-
-.feed-header {
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e1e8ed;
-}
-
-.tweet-composer {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 20px;
-  padding: 10px 0;
-  border-bottom: 1px solid #e1e8ed;
-}
-
-.tweet-composer img.avatar {
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.tweet-composer textarea {
-  width: 100%;
-  height: 80px;
-  padding: 10px;
-  border: 1px solid #e1e8ed;
-  border-radius: 8px;
-  resize: none;
-  font-size: 16px;
-}
-
-.tweet-options {
-  display: flex;
-  gap: 20px;
-  margin-left: 15px;
-}
-
-.composer-tweet-button {
-  background-color: #1da1f2;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  margin: 10px;
-}
-
-.composer-tweet-button:hover {
-  background-color: #1991db;
-}
-
-/* Tweet (Post) */
-.timeline .tweet {
-  background-color: white;
-  border: 1px solid #e1e8ed;
   padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 8px;
+  margin: 25px 0;
 }
 
-.tweet-header {
-  display: flex;
-  align-items: center;
-}
-
-.tweet-header img.avatar {
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.tweet-author-info {
-  display: flex;
-  align-items: center;
-}
-
-.name {
-  font-weight: bold;
-}
-
-.handle {
-  color: #657786;
-  margin-left: 5px;
-}
-
-.verified-badge {
-  color: #1da1f2;
-  margin-left: 5px;
-}
-
-.timestamp {
-  margin-left: 10px;
-  font-size: 12px;
-  color: #657786;
-}
-
-.message {
-  margin: 0px 0px 10px 60px;
-}
-
-.tweet-footer {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 10px;
-  color: #657786;
-}
-
-/* Right Sidebar (Trends, Who to Follow) */
-.right-sidebar {
-  width: 25%;
-}
-
-.trends,
-.who-to-follow {
-  background-color: #f5f8fa; /* Background color for trends and who to follow */
-  border: 1px solid #e1e8ed;
-  padding: 15px;
-  border-radius: 8px;
+.sidebar-right h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
   margin-bottom: 20px;
 }
 
-.trends h3,
-.who-to-follow h3 {
-  margin-bottom: 10px;
-}
-
-.trends ul {
+.sidebar-right ul {
   list-style: none;
 }
 
-.trends ul li {
+.sidebar-right li {
   margin-bottom: 10px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.follow-suggestion {
-  display: flex;
-  align-items: center;
-}
-
-.follow-suggestion img.avatar {
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.follow-button {
-  background-color: #1da1f2;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.follow-button:hover {
-  background-color: #1991db;
+  font-size: 1rem;
+  color: rgb(151, 151, 151)
 }
 </style>
 

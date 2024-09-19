@@ -1,14 +1,12 @@
 <template>
-    <div class="trends">
-        <h3>Trends for you</h3>
+    <section>
+        <h2>What's happening</h2>
         <ul>
-            <li>#Technology</li>
-            <li>#VueJS</li>
-            <li>#JavaScript</li>
-            <li>#Python</li>
-            <li>#AI</li>
+            <li>#fediverse</li>
+            <li>#fedjust</li>
+            <li>#fensterfreitag</li>
         </ul>
-    </div>
+    </section>
 </template>
 
 <script>
