@@ -2,20 +2,20 @@
   <nav class="sidebar">
     <div class="logo">R<span class="logo-o">o</span>b<span class="logo-o">oto</span></div>
     <ul>
-      <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
-      <li><a href="#"><i class="fas fa-hashtag"></i> Explore</a></li>
-      <li><a href="#" class="small"><i class="fas fa-bell"></i> Notifications</a></li>
-      <li><a href="#"><i class="fas fa-envelope"></i> Messages</a></li>
-      <li><a href="#"><i class="fas fa-user"></i> Profile</a></li>
+      <li><router-link to="/home"><i class="fas fa-home"></i> Home</router-link></li>
+      <li><router-link to="/explore"><i class="fas fa-hashtag"></i> Explore</router-link></li>
+      <li><router-link to="/notifications"><i class="fas fa-bell"></i> Notifications</router-link></li>
+      <li><router-link to="/messages"><i class="fas fa-envelope"></i> Messages</router-link></li>
+      <li><router-link to="/profile"><i class="fas fa-user"></i> Profile</router-link></li>
     </ul>
     
-    <div v-if="isLoggedIn">
+    <div v-if="authStore.isLoggedIn">
       <button class="post-button" @click="tweetStore.submitPost">Post</button>
     </div>
     
     <div class="login" v-else>
       <hr>
-      <p>Log in to repost or comment. Let's take it back 🎶.</p>
+      <p>Log in to publish, repost or comment. We are taking back the Internet ✊.</p>
       <button class="login-button" @click="showLoginModal = true">Login</button>
     </div>
 
@@ -26,25 +26,23 @@
 
 <script>
 import { useTweetStore } from '../stores/tweetStore';
-import LoginOverlay from './LoginOverlay.vue';  // Import the LoginOverlay component
+import { useAuthStore } from '../stores/authStore';
+import LoginOverlay from './LoginOverlay.vue';  
 
 export default {
   components: {
-    LoginOverlay,  // Register the LoginOverlay component
+    LoginOverlay, 
   },
   setup() {
+    const authStore = useAuthStore();
     const tweetStore = useTweetStore();
-    return { tweetStore };
+
+    return { authStore, tweetStore };
   },
   data() {
     return {
       showLoginModal: false,  // Control modal visibility
     };
-  },
-  computed: {
-    isLoggedIn() {
-      return !!localStorage.getItem('token');
-    },
   },
 };
 </script>

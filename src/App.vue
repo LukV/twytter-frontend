@@ -1,61 +1,49 @@
 <template>
   <div id="app">
     <div class="container">
-      <SideBar />
-      <main class="feed">
-        <header>
-          <h1><i class="fa fa-arrow-left"></i> Home</h1>
-        </header>
-        <TweetComposer />
-        <div class="tabs">
-          <button class="tab active" id="for-you-tab">For you</button>
-          <button class="tab" id="following-tab">Following</button>
-        </div>
-        <div class="timeline">
-          <TweetsFeed v-for="post in tweetStore.posts" :key="post.timestamp" :post="post" />
-        </div>
-      </main>
-
+      <SideBar /> <!-- Sidebar will remain static -->
+      <!-- Dynamic content based on the current route -->
+      <router-view />
       <!-- Right Sidebar (Optional for trends, etc.) -->
       <aside class="sidebar-right">
         <UserProfile />
         <TrendingTags />
         <SuggestedFollows />
       </aside>
+
+      <!-- Conditionally show modals based on current route -->
+      <LoginOverlay v-if="currentRoute === 'login'" @close="closeModal" />
     </div>
   </div>
 </template>
 
-
-
 <script>
-import { useTweetStore } from './stores/tweetStore';
+import { useRoute, useRouter } from 'vue-router';
 import SideBar from './components/SideBar.vue';
-import TweetComposer from './components/TweetComposer.vue';
-import TweetsFeed from './components/TweetsFeed.vue';
 import TrendingTags from './components/TrendingTags.vue';
 import SuggestedFollows from './components/SuggestedFollows.vue';
 import UserProfile from './components/UserProfile.vue';
+import LoginOverlay from './components/LoginOverlay.vue';
 
 export default {
   components: {
     SideBar,
-    TweetComposer,
-    TweetsFeed,
     TrendingTags,
-    SuggestedFollows, 
-    UserProfile
+    SuggestedFollows,
+    UserProfile,
+    LoginOverlay
   },
   setup() {
-    const tweetStore = useTweetStore();
-    tweetStore.fetchPosts(); // Fetch posts when the component is mounted
-    return { tweetStore };
-  },
-  data() {
+    const route = useRoute();
+    const router = useRouter();
+
+    const closeModal = () => {
+      router.push('/home'); // Close the modal by redirecting to home
+    };
+
     return {
-      email: '',
-      password: '',
-      errorMessage: '',
+      currentRoute: route.meta.showModal,
+      closeModal
     };
   },
 };

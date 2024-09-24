@@ -1,62 +1,68 @@
 <template>
-    <div class="login-container">
-      <h2>Log in</h2>
-      <form @submit.prevent="login">
-        <div class="input-group">
-          <label>Email or username</label>
-          <input v-model="username" type="text" placeholder="Email or username" required />
-        </div>
-        <div class="input-group">
-          <label>Password</label>
-          <input v-model="password" type="password" placeholder="Password" required />
-          <!-- You can add an eye icon for password visibility here -->
-        </div>
-        <div class="forgot-password">
-          <a href="#">Forgot password?</a>
-        </div>
-        <button type="submit" class="login-button">Log in</button>
-      </form>
-      <div class="signup-link">
-        <p>Don't have an account? <a href="#" @click.prevent="$emit('switchToRegister')">Sign up</a></p>
+  <div class="login-container">
+    <h2>Log in</h2>
+    <form @submit.prevent="login">
+      <div class="input-group">
+        <label>Email or username</label>
+        <input v-model="username" type="text" placeholder="Email or username" required />
       </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input v-model="password" type="password" placeholder="Password" required />
+      </div>
+      <div class="forgot-password">
+        <a href="#">Forgot password?</a>
+      </div>
+      <button type="submit" class="login-button">Log in</button>
+    </form>
+    <div class="signup-link">
+      <p>Don't have an account? <a href="#" @click.prevent="$emit('switchToRegister')">Sign up</a></p>
     </div>
-  </template>
+    <p v-if="errorMessage">{{ errorMessage }}</p>
+  </div>
+</template>
 
 <script>
 import axios from 'axios';
+import { useAuthStore } from '../stores/authStore';
 
 export default {
-    data() {
-        return {
-            username: '',
-            password: '',
-            errorMessage: '',
-        };
-    },
-    methods: {
-        async login() {
-            const formData = new FormData();
-            formData.append('username', this.username);
-            formData.append('password', this.password);
+  data() {
+    return {
+      username: '',
+      password: '',
+      errorMessage: '',
+    };
+  },
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
+  methods: {
+    async login() {
+      try {
+        const formData = new FormData();
+        formData.append('username', this.username);
+        formData.append('password', this.password);
 
-            try {
-            const response = await axios.post('http://localhost:8000/login/', formData, {
-                headers: {
-                'Content-Type': 'multipart/form-data',
-                },
-            });
-            localStorage.setItem('token', response.data.access_token);
-            this.errorMessage = 'Logged in';
-            } catch (error) {
-                this.errorMessage = 'Invalid email or password';
-            }
-        },
+        const response = await axios.post('http://localhost:8000/login/', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        this.authStore.login(response.data.access_token);
+        this.errorMessage = 'Logged in';
+        this.$emit('close'); // Close the login modal or navigate as needed
+      } catch (error) {
+        this.errorMessage = 'Invalid email or password';
+      }
     },
+  },
 };
 </script>
 
 <style scoped>
-
 h2 {
   font-size: 24px;
   font-weight: 700;

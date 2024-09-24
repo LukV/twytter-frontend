@@ -2,7 +2,7 @@
   <section class="post-composer">
     <img :src="require('@/assets/user-1.png')" alt="User-1" class="profile-pic purple-border">
     <div class="post-form">
-      <textarea v-model="tweetStore.newPost.message" class="post-textarea" placeholder="What's on your mind?"></textarea>
+      <textarea v-model="tweetStore.newPost.message" class="post-textarea" placeholder="What will you share today?"></textarea>
       <div class="post-media">
         <div class="icons">
           <a href="#"><i class="fas fa-video-camera"></i></a>
